@@ -1,0 +1,423 @@
+.packageName <- "diffGeneAnalysis"
+"dataTrim" <-
+function(chipdata){
+  x<-TRUE
+  cut<-chipdata
+  len <-length(chipdata)
+  newlen<-0
+  while(x==TRUE){
+  mean30<-mean(cut)
+  std<-sd(cut)
+  plus2SD <-mean30 + (2*std)
+  cut<-cut[cut < plus2SD]
+  #print("recompute mean and sd")
+  mean230<-mean(cut)
+  std2<-sd(cut)
+  minus2SD <-mean230 - (2*std2)
+  #data below -2sd are cut
+  cut<-cut[cut > minus2SD]
+  len <-length(cut)
+  if(newlen==len)
+  x<-FALSE
+  else
+  newlen<-length(cut)
+  }
+  cut
+  }
+
+"curveFit" <-
+function(chipdata,plot){ 
+ selectGraph<-function( ){
+menu(c(2,3,4,4.5,5,5.5),graphics=TRUE,title="Pick Best Fit")
+}
+
+  mx<-max(chipdata)
+  mn<-min(chipdata)
+  breakrange <- (mx -mn)/10
+  x1<-range(chipdata)
+  x<-0:10
+  par(col.lab="red")
+  vals<-hist(chipdata, breaks =mn+x*breakrange,probability=TRUE,plot=FALSE,
+  xlim = x1, ylim = NULL, xlab="Total length", main="",angle=45, density=13,col="green",border="red")
+  suppressWarnings(par(col="red",new=TRUE,ann=FALSE,xaxt="s",yaxt="s"))
+  par(mfrow=c(3,2))
+  freqs<-vals$counts 
+  fr<-vals$counts[1]
+  xs<-NULL
+  nmeans<-NULL
+  nsds<-NULL
+  for(gr in 1:6){
+  gr2<-gr-1
+  gr3<-gr+1
+  gr4<-gr3-1
+  if(gr==6){
+  sm<-vals$breaks[6]
+  fr<-fr+round(0.5*vals$counts[6])
+  xs<-c(vals$mids[1:5],vals$breaks[6])
+  sys<-sd(xs)
+  }
+  else if(gr==4){
+  sm<-vals$breaks[5]
+  fr<-fr+round(0.5*vals$counts[5])
+  xs<-c(vals$mids[1:4],vals$breaks[5])
+  sys<-sd(xs)
+  }
+  else{
+  sm<-vals$mids[gr3]
+  fr<-fr+vals$counts[gr3]
+  if(gr==5){
+  xs<-c(vals$mids[1:gr])}
+  else{
+  xs<-c(vals$mids[1:gr3])}
+  sys<-sd(xs)
+  }
+  par(col="red",xaxt="s",yaxt="s",lab=c(5,5,7))
+  if(plot==1){
+  vals<-suppressWarnings(hist(chipdata, breaks =mn+x*breakrange,freq=FALSE,
+  xlim = x1, ylim = NULL, xlab="Total length", main="",angle=45, density=13,col="green",border="red"))}
+  else{
+  vals<-hist(chipdata, breaks =mn+x*breakrange,freq=TRUE,plot=FALSE,
+  xlim = x1, ylim = NULL, xlab="Total length", main="",angle=45, density=13,col="green",border="red")}
+  range3<-chipdata[fr] - chipdata[1]
+  xs1<-c(chipdata[1:fr],chipdata[1:fr]+range3)
+  emean<-mean(xs1)
+  tsd<-sd(xs1)
+  if(gr==6 || gr==5){
+  range2<-xs[gr] - xs[1]
+  values<-c(xs,xs+range2)
+  le<-2 * gr
+  gr5<-gr+2
+  values<-c(values[1:gr2],values[gr5:le])}
+  else if(gr ==4){
+  range2<-xs[gr3] - xs[1]
+  values<-c(xs,xs+range2)
+  le2<-2 * gr3
+  gr5<-gr+2
+  values<-c(values[1:gr4],values[gr5:le2])
+  }
+  else{
+  range2<-xs[gr3] - xs[1]
+  values<-c(xs,xs+range2)
+  le2<-2 * gr3
+  gr5<-gr+2
+  values<-c(values[1:gr4],values[gr5:le2])
+  }
+  if(gr==6 || gr==5){
+  ys<-c(vals$density[1:gr2],vals$density[gr2:1])}
+  else{
+  ys<-c(vals$density[1:gr4],vals$density[gr3:1])}
+  sm1<-mean(values)
+  sys1<-sd(values)
+  suppressWarnings(par(col="blue",new=TRUE,ann=FALSE,xaxt="n",yaxt="n"))#,fig=c(0,gr3/10,0,1)))
+  f <- function(tsd, emean, values) {
+    expr <- expression(1/(sqrt(2*pi)*tsd)*2.71828^-((values-emean)^2/(2*tsd^2)))
+    eval(expr)
+    }
+  p<-c("tsd" = tsd, "emean" = emean)
+  N<-do.call("f", c(list(values=values),as.list(p)))
+  set.seed(411)
+  guess<-c("tsd" = sys, "emean" = sm)
+  fcn<- function(p, values, N, N.Err, fcall)
+         (N - do.call("fcall", c(list(values = values), as.list(p))))/N.Err
+  out <- nls.lm(par = guess, fn = fcn, #jac = fcn.jac,
+ fcall = f,
+                   values = values, N = N, N.Err = sqrt(N),
+                   control = list(nprint = 3, diag = numeric()))
+  N1 <- do.call("f", c(list(values = values), out$par))
+ dn<-dnorm(xs1,mean=out$par[[2]],sd=out$par[[1]])
+ m<-max(vals$density)
+ mm<-max(dn)
+ fac<-m/mm
+ dn<-dn * fac
+  points(dn ~ xs1,type="l",lwd=3,col="blue")
+  nmeans<-c(nmeans,out$par[[2]])
+  nsds<-c(nsds,out$par[[1]])
+  }#for loop
+ print(nmeans)
+ print(nsds)
+  ch<-selectGraph()
+  ch1<-menu(c("y","n"),graphics=TRUE,title="Confirm Curvefit Selection")
+  while(!ch1==1){
+  ch<-selectGraph()
+  ch1<-menu(c("y","n"),graphics=TRUE,title="Confirm Curvefit Selection")}
+  if(ch==1){
+  assign("nmean",nmeans[1],inherits=TRUE,env=.GlobalEnv)
+  assign("nsd",nsds[1],inherits=TRUE,env=.GlobalEnv)
+  res<-c(nmean,nsd)}
+  else if(ch==2){
+  assign("nmean",nmeans[2],inherits=TRUE,env=.GlobalEnv)
+  assign("nsd",nsds[2],inherits=TRUE,env=.GlobalEnv)
+  res<-c(nmean,nsd)}
+  else if(ch==3){
+  assign("nmean",nmeans[3],inherits=TRUE,env=.GlobalEnv)
+  assign("nsd",nsds[3],inherits=TRUE,env=.GlobalEnv)
+  res<-c(nmean,nsd)}
+  else if(ch==4){
+  assign("nmean",nmeans[4],inherits=TRUE,env=.GlobalEnv)
+  assign("nsd",nsds[4],inherits=TRUE,env=.GlobalEnv)
+  res<-c(nmean,nsd)}
+  else if(ch==5){
+  assign("nmean",nmeans[5],inherits=TRUE,env=.GlobalEnv)
+  assign("nsd",nsds[5],inherits=TRUE,env=.GlobalEnv)
+  res<-c(nmean,nsd)}
+  else if(ch==6){
+  assign("nmean",nmeans[6],inherits=TRUE,env=.GlobalEnv)
+  assign("nsd",nsds[6],inherits=TRUE,env=.GlobalEnv)
+  res<-c(nmean,nsd)}
+  else
+  print("Pick a Numeric choice between 1 - 6")
+ print(res)
+}
+
+"normalize" <-
+function(rawdata,numSlides,ctrl,expm,ctrlbg=0.30,expmbg=0.30){
+#x<-TRUE
+normOut<-rawdata
+slideNum<-2
+cslides<-ctrl + 1
+eslides<-cslides + 1
+lslide<-numSlides + 1
+
+for(c in 2:cslides){
+ answer<-rawdata[,c]
+ len<-length(answer)
+ sorted<-sort(answer)
+ subsetSize<- ctrlbg * len
+ answer<-sorted[1:subsetSize]
+ trimmed<-dataTrim(answer)
+ plot<-1
+ pl<-curveFit(trimmed,plot)
+ dev.off()
+ ch3<-menu(c("y","n"),graphics=TRUE,title="Did you like the Histogram Distribution?")
+ while(!ch3==1){
+ print("Enter Background Percentage Value: 0.30 was your default")
+ cbg<-scan("",what="double",n=1)
+ ctrlbg<-as.double(cbg)
+ subsetSize<- ctrlbg * len
+ answer<-sorted[1:subsetSize]
+ trimmed<-dataTrim(answer)
+ plot<-1
+ pl<-curveFit(trimmed,plot)
+ dev.off()
+ ch3<-menu(c("y","n"),graphics=TRUE,title="Did you like the Histogram Distribution?")
+ }
+ totset<-rawdata
+ values<-1:length(rawdata[,c])
+ rawdata[,c]<-(rawdata[,c][values]-pl[1])/pl[2]
+ set<-rawdata[,c][rawdata[,c] > 0]
+ minLog<-min(set)
+ rawdata[,c] [rawdata[,c] <= 0] <-minLog
+ rawdata[,c]<-log10(rawdata[,c][values])
+ #replace -ve logs from the rawdata
+ totset[,c] <- rawdata[,c]
+ normOut[,c]<-totset[,c]
+}
+
+for(e in eslides:lslide){
+answer<-rawdata[,e]
+len<-length(answer)
+ sorted<-sort(answer)
+ subsetSize<- expmbg * len
+ answer<-sorted[1:subsetSize]
+ trimmed<-dataTrim(answer)
+ plot<-1
+ pl<-curveFit(trimmed,plot)
+ dev.off()
+ ch3<-menu(c("y","n"),graphics=TRUE,title="Did you like the Histogram Distribution?")
+ while(!ch3==1){
+ print("Enter Background Percentage Value: 0.30 was your default")
+ ebg<-scan("",what="double",n=1)
+ expmbg<-as.double(cbg)
+ subsetSize<- expmbg * len
+ answer<-sorted[1:subsetSize]
+ trimmed<-dataTrim(answer)
+ plot<-1
+ pl<-curveFit(trimmed,plot)
+ dev.off()
+ ch3<-menu(c("y","n"),graphics=TRUE,title="Did you like the Histogram Distribution?")
+ }
+ totset<-rawdata
+ values<-1:length(rawdata[,e])
+ rawdata[,e]<-(rawdata[,e][values]-pl[1])/pl[2]
+ set<-rawdata[,e][rawdata[,e] > 0]
+ minLog<-min(set)
+ rawdata[,e] [rawdata[,e] <= 0] <-minLog
+ rawdata[,e]<-log10(rawdata[,e][values])
+ #replace -ve logs from the rawdata
+ totset[,e] <- rawdata[,e]
+ normOut[,e]<-totset[,e]
+}
+normOut
+}
+
+"biasAdjust" <-
+function(normalized,numSlides){
+ zTrans3<-normalized
+ zTrans1<-normalized
+  for(x in 1:6){
+   nSlides<-numSlides+1
+   nthSlide<-2 : nSlides
+   geneNum<-length(zTrans3[,1])
+   geneAvjs<-(rowSums(zTrans3[1:geneNum,][nthSlide]))/numSlides
+   gindex<-which(geneAvjs > 0.47)
+   gAvjs<-geneAvjs[geneAvjs >0.47]
+   zTrans<-zTrans3[gindex,]
+   for(j in 2:nSlides){
+   gAvjs2<-gAvjs
+   zTrans2<-zTrans[,j]
+   zTrans22<-zTrans[,j]
+   zTrans2<-zTrans2 - gAvjs2
+   regData<-zTrans2
+   beforetrim<-regData 
+   trim<-dataTrim(beforetrim)
+   nmean<-mean(trim)
+   nsd<-sd(trim)  
+   plus2SD <-nmean + (2*nsd)
+   minus2SD <-nmean - (2*nsd)
+   zT2index2<-which(zTrans2 > minus2SD)
+   gAvjs2<-gAvjs2[zT2index2]
+   zTrans22<-zTrans22[zT2index2]
+   zTrans23<-zTrans22
+   zTrans2<-zTrans2[zT2index2]
+   gAvjs3<-gAvjs2
+   zT2index<-which(zTrans2 < plus2SD)
+   gAvjs3<-gAvjs3[zT2index]
+   zTrans23<-zTrans23[zT2index]
+   linReg.lm<-lm(zTrans23 ~ gAvjs3)
+   param<-coef(linReg.lm)
+   zTrans1[1:geneNum,j]<-(zTrans1[1:geneNum,j]-param[[1]])/(param[[2]])
+   zTrans3[,j]<-zTrans1[,j]
+   }
+  }
+ param[[1]]
+ param[[2]]
+ zTrans3
+}
+
+"assocAnalysis" <-
+function(bAdjusted,numSlides,ctrl,exp,sdrefgrp,pctrl,pexpm,ctrlavjs,expmavjs,ctrlsds,expmsds,rgrplen){
+ e<-ctrl+1
+ ee<-e+1
+ ex<-numSlides+1
+ geneNum<-length(bAdjusted[,2])
+ refgrpNum <- rgrplen * ctrl
+ t3<-data.matrix(bAdjusted)
+ studentt<-apply(t3, 1, function(x) t.test(x[2:e], x[ee:ex],var.equal=TRUE)$p.value)
+ col7studentpval<- studentt #* 2 #$p.value
+ ctrlgeneavj<-rowMeans(bAdjusted[,2:e])
+ expvals2<-bAdjusted[,ee:ex] - ctrlgeneavj
+ avjnewgrp<-rowMeans(expvals2)
+ sdnewgrp<-sd(t(expvals2))
+ newtstat<-(avjnewgrp/(sqrt(sdnewgrp*sdnewgrp/exp))+(sqrt(sdrefgrp*sdrefgrp/refgrpNum)))
+ tresults<-pnorm(newtstat,mean=0,sd=1)
+ tresults<-ifelse(tresults > 0.5, 1-tresults,tresults)
+ col8pvals<-tresults * 2
+ col9<-expmavjs/ctrlavjs
+ print("Enter E Value")
+ E<-scan("",what="double",n=1)
+ print("Enter R Value")
+ R<-scan("",what="double",n=1)
+ che<-as.double(E)
+ chr<-as.double(R)
+ group<-NULL
+ R<-expmavjs/ctrlavjs
+ t<-1/rgrplen
+ for(x in 1:geneNum){
+ if(pctrl[x] < t &&  pexpm[x] < t 
+ && col7studentpval[x] < 0.05 && col8pvals[x] < t && col9[x] > chr)
+ {group[x]="A1"}
+
+ else if(pctrl[x] < t && pexpm[x] < t 
+ && col7studentpval[x] < 0.05 && col8pvals[x] < t && col9[x] <=(che/chr))
+ {group[x]="A2"}
+
+ else if(pctrl[x] < t && pexpm[x] > t 
+ && col7studentpval[x] < 0.05 && col9[x] < 0.66)
+ {group[x]="A4"}
+
+ else if(pctrl[x] > t && pexpm[x] < t 
+ && col7studentpval[x] < 0.05 && col9[x] > chr)
+ {group[x]="A3"}
+
+ else{ group[x]="0"}
+ }
+ results<-matrix(data=NA,nrow=geneNum,ncol=11)
+ results[,1] <-bAdjusted[,1]
+ results[,2] <-ctrlavjs
+ results[,3] <-ctrlsds
+ results[,4] <-pctrl
+ results[,5] <-expmavjs
+ results[,6] <-expmsds
+ results[,7] <-pexpm
+ results[,8] <-col7studentpval
+ results[,9] <-col8pvals
+ results[,10] <-col9
+ results[,11] <-group
+
+ results
+}
+
+"refGroup" <-
+function(biasAdjusted,numSlides,ctrl,exp,pval){
+  bAdjusted<-biasAdjusted
+  nSlides<-numSlides+1
+  nthSlide<-2 : nSlides
+  geneNum<-length(biasAdjusted[,1])
+  zTrans4<-biasAdjusted[1:geneNum,nthSlide]
+  biasAdjusted[1:geneNum,nthSlide]<-(10 ^(biasAdjusted[1:geneNum,nthSlide]))
+  ctrls<-ctrl+1
+  control<-2:ctrls
+  ctrl2<-ctrls+1
+  expm<-ctrl2:nSlides
+  n1<-0.20 * (geneNum * ctrl)
+  n2<-0.20 * (geneNum * exp)
+  ctrlavjs<-rowMeans(biasAdjusted[1:geneNum,control])
+  ctrlsds<-sd(t(biasAdjusted[,control]))
+  expmavjs<-rowMeans(biasAdjusted[1:geneNum,expm])
+  expmsds<-sd(t(biasAdjusted[,expm]))
+  tstatctrl<-suppressWarnings(ctrlavjs/sqrt(((ctrlsds*ctrlsds)/ctrl)+(1/n1)))
+  tstatexpm<-suppressWarnings(expmavjs/sqrt(((expmsds*expmsds)/exp)+(1/n2)))
+  dnormctrl<-pnorm(tstatctrl)
+  dnormexpm<-pnorm(tstatexpm)
+  dnormctrl<-ifelse(dnormctrl > 0.5, 1-dnormctrl,dnormctrl)
+  dnormexpm<-ifelse(dnormexpm > 0.5, 1-dnormexpm,dnormexpm)
+  pctrl<-dnormctrl * 2
+  pexpm<-dnormexpm * 2
+   r<-(nrow(zTrans4))
+   geneAvjs<-(rowSums(zTrans4[,1:ctrl]))/ctrl
+   gindex<-which(geneAvjs > 0.477)
+   gAvjs<-geneAvjs[geneAvjs > 0.477]
+   zTransR<-zTrans4[gindex,]
+   genenum<-nrow(zTransR)
+ cut<-nrow(zTransR)
+ len<-0
+ zTransRef<-zTransR - gAvjs
+  while( len != cut){
+ cut<-nrow(zTransRef)
+ refgrp<-c(zTransRef[,1:ctrl],recursive=TRUE)
+ rgrplen<-length(refgrp)
+ sdrefgrp<-sd(refgrp)
+ sdgenes<-sd(t(zTransRef[,1:ctrl]))
+ count<-length((sdgenes))
+ refgrpsd2<-sdrefgrp * sdrefgrp
+ SdGenes2<-sdgenes * sdgenes
+ generatios<-refgrpsd2/SdGenes2
+ fvals<-pf(generatios,count-1,ctrl-1)
+ l3<-length(fvals)
+ for(z in 1:l3){
+ if(fvals[z] > 0.5){
+ fvals[z]<- 1 - fvals[z]}}
+ pvalftest<-fvals *2
+ gindex2<-which(sdgenes < sdrefgrp)
+ gindex22<-which(pvalftest > pval)
+ gindex33<-union(gindex2,gindex22)
+ gindex33<-sort(gindex33)
+   zTransRef<-zTransRef[gindex33,]
+   len<-nrow(zTransRef)
+  if(cut==len){break}
+ }
+ print(sdrefgrp)
+ print(len)
+ assocAnalysis(bAdjusted,numSlides,ctrl,exp,sdrefgrp,pctrl,pexpm,ctrlavjs,expmavjs,ctrlsds,expmsds,rgrplen)
+}
+

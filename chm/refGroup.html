@@ -1,0 +1,195 @@
+<html><head><title>Reference Group computes a robust estimate of inter-assay
+variability (Standard Error)</title>
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>refGroup(diffGeneAnalysis)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   refGroup">
+<param name="keyword" value=" Reference Group computes a robust estimate of inter-assay
+variability (Standard Error)">
+</object>
+
+
+<h2>Reference Group computes a robust estimate of inter-assay
+variability (Standard Error)</h2>
+
+
+<h3>Description</h3>
+
+<p>
+refGroup takes a normalized, bias adjusted dataset and
+computes a robust estimate of inter-assay variability
+(Standard Error).This value is used here to perform T-tests.
+It can also be used in sample size calculations.The
+associative analysis method is then applied to the
+computed refernce group.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+refGroup(biasAdjusted, numSlides, ctrl, exp, pval)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>biasAdjusted</code></td>
+<td>
+biasAdjusted is a matrix of bias adjusted
+normalized microarray data.The first row consists of
+headers and the first column must consist of Gene Bank
+Id's.</td></tr>
+<tr valign="top"><td><code>numSlides</code></td>
+<td>
+numSlides represents the total number of
+chips in a microarray dataset
+including control and experiment.</td></tr>
+<tr valign="top"><td><code>ctrl</code></td>
+<td>
+ctrl represents the total number of ctrl chips
+in the microarray.</td></tr>
+<tr valign="top"><td><code>exp</code></td>
+<td>
+exp represents the total number of experiment
+chips in the microarray.</td></tr>
+<tr valign="top"><td><code>pval</code></td>
+<td>
+pval is the strigency value for computing the
+reference group. 0.05 is the normally suggested value.</td></tr>
+</table>
+
+<h3>Details</h3>
+
+<p>
+AssociativeAnalysis performs the Associative-T method of
+differential gene analysis.The user is asked to enter
+values for E and R.E stand for the increase in fold over 
+background and R stands for the ratio of experimental
+chips average over control chips average. The higher
+these values the higher will be the stringency. Example
+dataset used here was run with an E values of 1 and R
+value of 1.5.
+</p>
+<p>
+The results are displayed in a 10 column matrix as follows
+</p>
+<p>
+Column       Representation.
+</p>
+<p>
+1     Gene Bank ID
+</p>
+<p>
+2     Average Signal of the Control Chips/Channels.
+</p>
+<p>
+3     SD of Control Chips/Channels.
+</p>
+<p>
+4     Probability that a given gene in the Control Chips/Channels
+belongs or does not belong to background.
+</p>
+<p>
+5     Average Signal of the Experimental Chips/Channels.
+</p>
+<p>
+6     SD of Experimental Chips/Channels.
+</p>
+<p>
+7     Probability that a given gene in the Experimental
+Chips/Channels belongs or does not belong to background.
+</p>
+<p>
+8     P-value from a Student T-test.
+</p>
+<p>
+9     P-value from an Associative T-test.
+</p>
+<p>
+10    Ratio of mean expression values (Control/Experimental).
+</p>
+<p>
+11    Group Number.
+</p>
+<p>
+Group Numbers are defined as follows:.
+</p>
+<p>
+A1      Expressed above background in both sample types, but
+over-expressed on the Experimental Chips/Channels.
+</p>
+<p>
+A2      Expressed above background in both sample types, but
+over-expressed on the Control Chips/Channels.
+</p>
+<p>
+A3      Expressed above background only on the Experimental
+Chips/Channel.
+</p>
+<p>
+A4      Expressed above background only in the Control
+Chips/Channel.
+</p>
+<p>
+0       None of the above.
+</p>
+
+
+<h3>Value</h3>
+
+<p>
+A matrix of 11 columns as described in the details and n
+rows where n stands for the number of genes in the microarray
+dataset.</p>
+
+<h3>Note</h3>
+
+<p>
+refGroup takes 4-5 seconds to execute under optimal
+conditions of size of datasets and speed of the
+machine.Tested on Pentium IV 1.6Ghz, 256 MB RAM with
+22464 genes and 10 chips it took 25 seconds to execute.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>
+Choudary L Jagarlamudi
+</p>
+
+
+<h3>References</h3>
+
+<p>
+Dozmorov I,Centola,M. An associative analysis of
+gene expression array data.Bioinformatics.
+2003 Jan22;19(2):204-11
+</p>
+<p>
+Knowlton N,Dozmorov I, Centola M. Microarray data Analysis
+Tool box(MDAT): for normalization,adjustment and analysis 
+of gene expression data.Bioonformatics.
+2004 Dec 12;20(18):3687-90
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+#bAdjusted is loaded in the package. Run Example as follows:
+#data(bAdjusted)
+#refGroup(bAdjusted,7,3,4,0.05)
+
+</pre>
+
+
+
+<hr><div align="center">[Package <em>diffGeneAnalysis</em> version 1.10 <a href="00Index.html">Index]</a></div>
+
+</body></html>

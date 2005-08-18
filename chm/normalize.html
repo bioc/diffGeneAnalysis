@@ -1,0 +1,129 @@
+<html><head><title>Normalization of microarray data</title>
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>normalize(diffGeneAnalysis)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   normalize">
+<param name="keyword" value=" Normalization of microarray data">
+</object>
+
+
+<h2>Normalization of microarray data</h2>
+
+
+<h3>Description</h3>
+
+<p>
+Normalization of data utilizing information obtained from
+background fluoresence.Background fluoresce intensity values
+are used to determine a Gaussian distribution of lowly
+expressed genes,yielding the background
+estimates(mean and standard deviation).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+normalize(rawdata, numSlides,ctrl,expm,ctrlbg,expmbg)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>rawdata</code></td>
+<td>
+rawdata is matrix of microarray data.The first column consists
+of gene Names and the first row consists of headers.</td></tr>
+<tr valign="top"><td><code>numSlides</code></td>
+<td>
+numSlides represents the total number of chips/slides in the
+microarray dataset including control and experiment.Control slides are
+always followed by experiment slides from left to right
+in the matrix.</td></tr>
+<tr valign="top"><td><code>ctrl</code></td>
+<td>
+ctrl represents the total number of control chips in the
+microarray dataset.</td></tr>
+<tr valign="top"><td><code>expm</code></td>
+<td>
+expm represents the total number of experiment chips in
+the microarray dataset.</td></tr>
+<tr valign="top"><td><code>ctrlbg</code></td>
+<td>
+ctrlbg represents the percent of data to pick for background
+computation of the control chips.30 percent is the default.</td></tr>
+<tr valign="top"><td><code>expmbg</code></td>
+<td>
+expmbg represents the percent of data to pick for background
+computation of the experiment chips.30 percent is the default.</td></tr>
+</table>
+
+<h3>Details</h3>
+
+<p>
+The normalization algorithm trims the data based on innitial emperical
+estimates of the mean and standard deviation.All data beyond +/-2SD of
+the mean are cut iteratively.This procedure is repeated until no more
+cuts can be made.The trimmed data is then subjected to a non linear
+curve fitting procedure. The user is presented with six different
+pictures obtained using bars 2,3,4,4.5,5,and5.5 as mean. The user is
+given the freedom to select the best visual estimate of background.
+The user selected parameters are used to perform a z-Trnasformation
+on the data.The percent of data selected to compute background depends
+on the data obtained.The default is 30 percent.A normal distributed
+histogram should confirm that, else the user is allowed to pick a 
+percent and make changes until the user sees a normal distributed
+histogram.Upon running normalize the user is presented with a set
+of 6 histograms. If the user is not happy with the default 30 percent,
+the user should go ahead and select a mean and confirm curvefit,then
+select 'no' to confirm histogram distribution.The user will be presented
+with a new set of 6 histograms. This process is repeated until the user
+selects the best Histogram distribution.This process is repeated for
+each individual chip.
+</p>
+
+
+<h3>Value</h3>
+
+<p>
+A matrix of normalized values of rawdata</p>
+
+<h3>Author(s)</h3>
+
+<p>
+Choudary L Jagarlamudi
+</p>
+
+
+<h3>References</h3>
+
+<p>
+Dozmorov I,Centola,M. An associative analysis of gene expression array data.
+Bioinformatics.2003 Jan22;19(2):204-11
+</p>
+<p>
+Knowlton N,Dozmorov I, Centola M. Microarray data Analysis Tool box(MDAT):
+for normalization,adjustment and analysis of gene expression data.
+Bioonformatics.2004 Dec 12;20(18):3687-90
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+#rawdata is loaded in the package. Run example as follows:
+#Read the description file for best results.
+#data(rawdata)
+#normalize(rawdata,7,3,4,0.15,0.60)
+
+</pre>
+
+
+
+<hr><div align="center">[Package <em>diffGeneAnalysis</em> version 1.10 <a href="00Index.html">Index]</a></div>
+
+</body></html>

@@ -1,0 +1,78 @@
+<html><head><title>DataTrim using pseudo winsorization algorithm</title>
+<link rel="stylesheet" type="text/css" href="Rchm.css">
+</head>
+<body>
+
+<table width="100%"><tr><td>dataTrim(diffGeneAnalysis)</td><td align="right">R Documentation</td></tr></table><object type="application/x-oleobject" classid="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+<param name="keyword" value="R:   dataTrim">
+<param name="keyword" value=" DataTrim using pseudo winsorization algorithm">
+</object>
+
+
+<h2>DataTrim using pseudo winsorization algorithm</h2>
+
+
+<h3>Description</h3>
+
+<p>
+DataTrim cleans the data through a pseudo winsorization algorithm.
+First, the mean and SD are calculated.  Then, any values above 2SD
+are trimmed.The mean is recalculated and any values less then 2 SD
+are trimmed.This process of cutting 2 SD above the mean and then
+2 SD below the mean is repeated until no further cuts are possible.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+dataTrim(chipdata)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>chipdata</code></td>
+<td>
+chipdata is a vector of chipdata from microarray
+chips.</td></tr>
+</table>
+
+<h3>Value</h3>
+
+<p>
+Returns a vector of trimmed chipdata representing background
+based on pseudo winsorization algorithm.</p>
+
+<h3>Author(s)</h3>
+
+<p>
+Choudary L Jagarlamudi
+</p>
+
+
+<h3>References</h3>
+
+<p>
+Dozmorov I,Centola,M. An associative analysis of gene expression array data.
+Bioinformatics.2003 Jan22;19(2):204-11
+</p>
+<p>
+Knowlton N,Dozmorov I, Centola M. Microarray data Analysis Tool box(MDAT):
+for normalization,adjustment and analysis of gene expression data.
+Bioonformatics.2004 Dec 12;20(18):3687-90
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+ #see normalize for details
+</pre>
+
+
+
+<hr><div align="center">[Package <em>diffGeneAnalysis</em> version 1.10 <a href="00Index.html">Index]</a></div>
+
+</body></html>
