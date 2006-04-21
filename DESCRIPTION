@@ -7,3 +7,4 @@ Maintainer: Choudary Jagarlamudi <choudary.jagar@swosu.edu>
 License: GPL
 Collate:dataTrim.R curveFit.R  normalize.R biasAdjust.R assocAnalysis.R refGroup.R
 Depends:minpack.lm (>= 1.0-4)
+biocViews: Statistics, Microarray, DifferentialExpression
