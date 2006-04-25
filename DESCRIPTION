@@ -1,6 +1,6 @@
 Package: diffGeneAnalysis
 Title: Performs differential gene expression Analysis
-Version: 1.13.0
+Version: 1.15.0
 Author: Choudary Jagarlamudi
 Description:Analyze microarray data
 Maintainer: Choudary Jagarlamudi <choudary.jagar@swosu.edu>
