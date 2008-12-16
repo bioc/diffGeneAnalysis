@@ -87,16 +87,16 @@ menu(c(2,3,4,4.5,5,5.5),graphics=TRUE,title="Pick Best Fit")
     eval(expr)
     }
   p<-c("tsd" = tsd, "emean" = emean)
-  N<-do.call("f", c(list(values=values),as.list(p)))
+  N<-do.call(f, c(list(values=values),as.list(p)))
   set.seed(411)
   guess<-c("tsd" = sys, "emean" = sm)
   fcn<- function(p, values, N, N.Err, fcall)
-         (N - do.call("fcall", c(list(values = values), as.list(p))))/N.Err
+         (N - do.call(fcall, c(list(values = values), as.list(p))))/N.Err
   out <- nls.lm(par = guess, fn = fcn, #jac = fcn.jac,
  fcall = f,
                    values = values, N = N, N.Err = sqrt(N),
                    control = list(nprint = 3, diag = numeric()))
-  N1 <- do.call("f", c(list(values = values), out$par))
+  N1 <- do.call(f, c(list(values = values), out$par))
  dn<-dnorm(xs1,mean=out$par[[2]],sd=out$par[[1]])
  m<-max(vals$density)
  mm<-max(dn)
