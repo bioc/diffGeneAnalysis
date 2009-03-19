@@ -1,10 +1,10 @@
 Package: diffGeneAnalysis
 Title: Performs differential gene expression Analysis
-Version: 1.25.0
+Version: 1.25.1
 Author: Choudary Jagarlamudi
 Description:Analyze microarray data
 Maintainer: Choudary Jagarlamudi <choudary.jagar@swosu.edu>
 License: GPL
 Collate:dataTrim.R curveFit.R  normalize.R biasAdjust.R assocAnalysis.R refGroup.R
 Depends:minpack.lm (>= 1.0-4)
-biocViews: Statistics, Microarray, DifferentialExpression
+biocViews: Bioinformatics, Microarray, DifferentialExpression
