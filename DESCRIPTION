@@ -6,5 +6,5 @@ Description:Analyze microarray data
 Maintainer: Choudary Jagarlamudi <choudary.jagar@swosu.edu>
 License: GPL
 Collate:dataTrim.R curveFit.R  normalize.R biasAdjust.R assocAnalysis.R refGroup.R
-Depends:minpack.lm (>= 1.0-4)
+Imports: graphics, grDevices, minpack.lm (>= 1.0-4), stats, utils
 biocViews: Bioinformatics, Microarray, DifferentialExpression

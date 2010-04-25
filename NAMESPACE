@@ -1,0 +1,7 @@
+importFrom(graphics, hist, par, points)
+importFrom(grDevices, dev.off)
+importFrom(minpack.lm, nls.lm)
+importFrom(stats, coef, dnorm, lm, pf, pnorm, sd, t.test)
+importFrom(utils, menu)
+
+export(assocAnalysis, biasAdjust, curveFit, dataTrim, normalize, refGroup)
