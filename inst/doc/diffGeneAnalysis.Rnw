@@ -39,14 +39,14 @@ the paper(i) in the refernces.
   3		SD of Control Chips/Channels.
 
   4		Probability that a given gene in the Control Chips/Channels
-        	Belongs or doesn’t belong to background.
+        	Belongs or doesn\'t belong to background.
  
   5		Average Signal of the Experimental Chips or Channels.
 
   6		SD of Experimental Chips or Channels.
 
   7		Probability that a given gene in the Experimental
-        	Chips or Channels belong or don’t belong to background.
+        	Chips or Channels belong or don\'t belong to background.
 
   8		P value from a Student T-test.
 
@@ -145,7 +145,7 @@ R>results<-refGroup(bAdjusted,7,3,4,0.05)
 
  (xv)	write.table(results, file = "c:/results.csv", sep = ",", col.names = NA)
 
- (xvi)	Open results.csv created in the “c:/” directory/ any other directory that u selected and analyze the results.
+ (xvi)	Open results.csv created in the "c:/" directory/ any other directory that u selected and analyze the results.
 
 
 {\bf Note:} In order to use the package in its entirety follow steps (x) to (xvi) in the same sequence. If the user decides to use other normalization and bias adjustment methods, save the normalized/ bias adjusted data in an excel file in the .csv format and follow steps (xii) to (xvi) sequentially.
